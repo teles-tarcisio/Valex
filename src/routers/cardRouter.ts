@@ -9,7 +9,7 @@ import { cardController } from "../controllers/index.js";
 
 const cardRouter = Router();
 
-cardRouter.get(
+cardRouter.post(
   "/cards/new-card",
   validateAPIKey,
   validateSchema(newCardSchema),
