@@ -1,7 +1,10 @@
 import Cryptr from "cryptr";
 
 import { cardRepository } from "../repositories/index.js";
-import { TransactionTypes } from "../repositories/cardRepository.js";
+import {
+  TransactionTypes,
+  CardInsertData,
+} from "../repositories/cardRepository.js";
 import {
   splitAndUpperCase,
   filterNamesBySize,
@@ -62,4 +65,8 @@ export function decryptCVC(encryptedCVC: string) {
   const decryptedString = cryptr.decrypt(encryptedCVC);
   
   return decryptedString;
+}
+
+export async function insertNewCard(newCardData: CardInsertData) : Promise<any> {
+  await cardRepository.insert(newCardData);
 }

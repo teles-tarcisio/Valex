@@ -47,10 +47,11 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
   // create expiration date:
   cardData.expirationDate = dayjs().add(5, "y").format("MM-YY");
   
-  // encriptar CVC com cryptr
   const encryptedCVC = cardServices.encryptCVC(cardData.securityCode);
-  console.log(encryptedCVC);
-  console.log(cardServices.decryptCVC(encryptedCVC));
+  cardData.securityCode = encryptedCVC;
+
   
-  return res.status(501).send(cardData);
+  await cardServices.insertNewCard(cardData);
+  
+  return res.sendStatus(201);
 }
