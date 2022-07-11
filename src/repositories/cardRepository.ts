@@ -122,3 +122,15 @@ export async function update(id: number, cardData: CardUpdateData) {
 export async function remove(id: number) {
   dbConnection.query<any, [number]>("DELETE FROM cards WHERE id=$1", [id]);
 }
+
+export async function findByCardNumber(number: string) {
+  const result = await dbConnection.query<Card, [string]>(
+    ` SELECT 
+        * 
+      FROM cards 
+      WHERE number=$1`,
+    [number],
+  );
+
+  return result.rows[0];
+}

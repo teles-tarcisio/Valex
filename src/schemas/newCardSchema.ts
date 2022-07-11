@@ -2,7 +2,7 @@ import Joi from "joi";
 
 const newCardSchema = Joi.object({
   employeeId: Joi.number().min(1).required(),
-  number: Joi.string().trim().length(16).required(),
+  number: Joi.string().trim().min(16).max(25).required(),
   cardholderName: Joi.string().trim().required(),
   securityCode: Joi.string().trim().min(3).max(4).required(),
   isVirtual: Joi.boolean().required(),
