@@ -3,6 +3,7 @@ import {
   newCardSchema,
   activateCardSchema,
   blockCardSchema,
+  rechargeCardSchema,
 } from "../schemas/index.js";
 import {
   validateAPIKey,
