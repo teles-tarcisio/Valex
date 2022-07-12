@@ -45,7 +45,6 @@ export async function newPayment(req: Request, res: Response): Promise<Object> {
     };
   }
 
-  // existentBusiness?
   const existentBusiness = await businessServices.find(businessId);
   if (!existentBusiness) {
     throw {
@@ -66,7 +65,7 @@ export async function newPayment(req: Request, res: Response): Promise<Object> {
 
 
   // TODO: card has enough balance?
-  // TODO: Sstore payment in db
+  // TODO: store payment in db
 
   await paymentServices.createPayment();
   return res.status(501).send("reached newPayment");

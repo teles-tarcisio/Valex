@@ -8,6 +8,7 @@ import {
   TransactionTypes,
   CardInsertData,
 } from "../repositories/cardRepository.js";
+import { paymentServices, rechargeServices } from "./index.js";
 import {
   splitAndUpperCase,
   filterNamesBySize,
@@ -121,4 +122,18 @@ export async function unblockCardById(cardId: number) {
       isBlocked: false,
     }
   );
+}
+
+export async function getBalance(cardId: number) {
+  const allRecharges = await rechargeServices.getCardRecharges(cardId);
+  const rechargeAmounts = allRecharges.map( recharge => recharge.amount );  
+  
+  
+  const allPayments = await paymentServices.getCardPayments(cardId);
+  const paymentAmounts = allPayments.map( payment => payment.amount );
+
+  console.log(rechargeAmounts);
+  console.log(paymentAmounts);
+  
+  //TODO: reduce to calculate balance
 }
