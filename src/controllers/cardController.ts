@@ -142,3 +142,45 @@ export async function blockCard(req: Request, res: Response): Promise<Object> {
 
   return res.status(201).send("card succesfully blocked");
 }
+
+export async function unblockCard(req: Request, res: Response): Promise<Object> {
+  const cardId: number = parseInt(req.params.id, 10);
+  
+  const existentCard = await cardServices.checkExistentCard(cardId);
+  if (!existentCard) {
+    throw {
+      type: "notFound",
+      message: "non-existent card",
+    };
+  }
+  
+  if(existentCard["isBlocked"] === false) {
+    throw {
+      type: "unprocessable",
+      message: "card is already unblocked",
+    };
+  }
+
+  const cardExpiration = existentCard["expirationDate"];
+  const isCardExpired = cardServices.checkExpiryDate(cardExpiration);
+  if (isCardExpired) {
+    throw {
+      type: "unprocessable",
+      message: "card is expired",
+    };
+  }
+
+  const password = res.locals.payload.password;
+  const hashedPassword = existentCard["password"];
+  const validatePassword = await bcrypt.compare(password, hashedPassword);
+  if(!validatePassword) {
+    throw {
+      type: "unauthorized",
+      message: "incorrect card password",
+    };
+  }
+  
+  await cardServices.unblockCardById(cardId);
+
+  return res.status(201).send("card succesfully unblocked");
+}

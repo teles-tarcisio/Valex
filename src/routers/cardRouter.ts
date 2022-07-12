@@ -15,11 +15,6 @@ import { cardController } from "../controllers/index.js";
 
 const cardRouter = Router();
 
-/* ATENCAO:
-  a requisicao de criar cartao aceita o numero do cartao,
-  mas gera-se uma nova string numerica de 16 digitos
-  que substitui o vindo na requisicao, antes do schema ser validado !
-*/
 cardRouter.post(
   "/cards/new-card",
   validateAPIKey,
@@ -38,6 +33,12 @@ cardRouter.put(
   "/cards/:id/block",
   validateSchema(blockCardSchema),
   cardController.blockCard,
+);
+
+cardRouter.put(
+  "/cards/:id/unblock",
+  validateSchema(blockCardSchema),
+  cardController.unblockCard,
 );
 
 export default cardRouter;

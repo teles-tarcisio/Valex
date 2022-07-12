@@ -105,12 +105,20 @@ export function checkExpiryDate(cardExpiration: string): boolean {
   return isExpired;
 }
 
-
 export async function blockCardById(cardId: number) {
   await cardRepository.update(
     cardId,
     {
       isBlocked: true,
+    }
+  );
+}
+
+export async function unblockCardById(cardId: number) {
+  await cardRepository.update(
+    cardId,
+    {
+      isBlocked: false,
     }
   );
 }
