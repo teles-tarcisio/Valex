@@ -70,3 +70,25 @@ export function decryptCVC(encryptedCVC: string) {
 export async function insertNewCard(newCardData: CardInsertData) : Promise<any> {
   await cardRepository.insert(newCardData);
 }
+
+export async function checkExistentCard(cardId: number) : Promise<Object> {
+  const existentCard = await cardRepository.findCardById(cardId);
+
+  return existentCard;
+}
+
+export async function checkCVC(receivedCVC: string, dbCVC: string): Promise<boolean> {
+  const decryptedCVC = decryptCVC(dbCVC);
+  
+  return (receivedCVC === decryptedCVC);
+}
+
+export async function createCardPassword(cardData, password: string) {
+  await cardRepository.update(
+    cardData.id,
+    { 
+      isBlocked: false,
+      password: password
+    }
+  );  
+}

@@ -134,3 +134,15 @@ export async function findByCardNumber(number: string) {
 
   return result.rows[0];
 }
+
+export async function findCardById(cardId: number) {
+  const result = await dbConnection.query<Card, [number]>(
+    ` SELECT 
+        * 
+      FROM cards 
+      WHERE id=$1`,
+    [cardId],
+  );
+
+  return result.rows[0];
+}

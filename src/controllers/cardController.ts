@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
+import bcrypt from "bcrypt";
 import dayjs from "dayjs";
+// import * as customParseFormat from "dayjs/plugin/customParseFormat";
+// dayjs.extend(customParseFormat);
+
 import {
   cardServices,
   employeeServices,
 } from "../services/index.js";
-import { decryptCVC } from "../services/cardServices.js";
 
 export async function createNewCard(req: Request, res: Response): Promise<Object> {
   const cardData: any = res.locals.payload;
@@ -44,7 +47,6 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
   const formattedNameOnCard = cardServices.formatCardName(cardData.cardholderName);
   cardData.cardholderName = formattedNameOnCard;
   
-  // create expiration date:
   cardData.expirationDate = dayjs().add(5, "y").format("MM-YY");
   
   const encryptedCVC = cardServices.encryptCVC(cardData.securityCode);
@@ -54,4 +56,51 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
   await cardServices.insertNewCard(cardData);
   
   return res.sendStatus(201);
+}
+
+export async function activateCard(req: Request, res: Response): Promise<Object> {
+  const cardId: number = parseInt(req.params.id, 10);
+
+  const existentCard = await cardServices.checkExistentCard(cardId);
+  if (!existentCard) {
+    throw {
+      type: "notFound",
+      message: "non-existent card",
+    };
+  }
+  console.log("CARTAO: ", existentCard);
+  
+  // conferir expirationDates <<<---
+  /*
+  const validadeCartao = existentCard["expirationDate"];
+  console.log(dayjs(validadeCartao, "MM-YY", true));
+  //console.log("válido?", dayjs(validadeCartao, "MM-YY").isValid());
+  
+  console.log(dayjs("07-27", "MM-YY").isAfter(dayjs("08-22", "MM-YY")), "<< depois");
+  */
+
+
+  // conferir cartão já ativado
+  if (existentCard["password"] !== null) {
+    throw {
+      type: "unprocessable",
+      message: "card already activated",
+    };
+  }
+  
+  const receivedCVC = res.locals.payload.securityCode;
+  const cardCVC = existentCard["securityCode"];
+  const validatedCVC =  await cardServices.checkCVC(receivedCVC, cardCVC);
+  if (!validatedCVC) {
+    throw {
+      type: "unauthorized",
+      message: "incorrect CVC",
+    };
+  }
+
+  const password = res.locals.payload.password;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await cardServices.createCardPassword(existentCard, hashedPassword);
+  
+  return res.status(201).send("card succesfully activated");
 }

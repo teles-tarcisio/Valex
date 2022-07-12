@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { newCardSchema } from "../schemas/index.js";
+import {
+  newCardSchema,
+  activateCardSchema,
+} from "../schemas/index.js";
 import {
   validateAPIKey,
   validateSchema,
@@ -13,8 +16,8 @@ const cardRouter = Router();
 
 /* ATENCAO:
   a requisicao de criar cartao aceita o numero do cartao,
-  mas é gerado um novo numero que o substitui o vindo na requisicao,
-  antes do schema ser validado !
+  mas gera-se uma nova string numerica de 16 digitos
+  que substitui o vindo na requisicao, antes do schema ser validado !
 */
 cardRouter.post(
   "/cards/new-card",
@@ -22,6 +25,12 @@ cardRouter.post(
   newFakeCardNumber,
   validateSchema(newCardSchema),
   cardController.createNewCard,
+);
+
+cardRouter.post(
+  "/cards/:id/activate",
+  validateSchema(activateCardSchema),
+  cardController.activateCard,
 );
 
 export default cardRouter;
