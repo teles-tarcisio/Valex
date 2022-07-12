@@ -27,10 +27,7 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
       message: "employee does not exist",
     };
   }
-  console.log("funcionario: ", existentEmployee);
-
-  // !! obter nome do funcionario a partir de employeeExists !
-  
+    
   const employeeCardsByType = await cardServices.checkEmployeeCards(cardData.employeeId, cardData.type);
   if (employeeCardsByType !== undefined) {
     throw {
@@ -55,9 +52,7 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
   const encryptedCVC = cardServices.encryptCVC(cardData.securityCode);
   cardData.securityCode = encryptedCVC;
 
-  
   await cardServices.insertNewCard(cardData);
-  
   return res.sendStatus(201);
 }
 
@@ -71,8 +66,7 @@ export async function activateCard(req: Request, res: Response): Promise<Object>
       message: "non-existent card",
     };
   }
-  //console.log("CARTAO: ", existentCard);
-  
+    
   const cardExpiration = existentCard["expirationDate"];
   
   const isCardExpired = cardServices.checkExpiryDate(cardExpiration);

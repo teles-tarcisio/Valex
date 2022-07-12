@@ -7,6 +7,7 @@ export default async function newFakeCardNumber(req: Request, res: Response, nex
   
   const newFakeCVC = faker.finance.creditCardCVV();
   req.body.securityCode = newFakeCVC;
+  console.log("(testing only) last generated CVC: ", newFakeCVC);
 
   next();
 }
