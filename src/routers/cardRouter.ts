@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   newCardSchema,
   activateCardSchema,
+  blockCardSchema,
 } from "../schemas/index.js";
 import {
   validateAPIKey,
@@ -31,6 +32,12 @@ cardRouter.post(
   "/cards/:id/activate",
   validateSchema(activateCardSchema),
   cardController.activateCard,
+);
+
+cardRouter.put(
+  "/cards/:id/block",
+  validateSchema(blockCardSchema),
+  cardController.blockCard,
 );
 
 export default cardRouter;
