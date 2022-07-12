@@ -1,4 +1,7 @@
 import Cryptr from "cryptr";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+dayjs.extend(customParseFormat);
 
 import { cardRepository } from "../repositories/index.js";
 import {
@@ -91,4 +94,13 @@ export async function createCardPassword(cardData, password: string) {
       password: password
     }
   );  
+}
+
+export function checkExpiryDate(cardExpiration: string): boolean {
+  
+  const adjustedMonthExpiration = dayjs(cardExpiration, "MM-YY").add(1, "M");
+  
+  const isExpired = dayjs(Date.now()).isAfter(adjustedMonthExpiration);
+  
+  return isExpired;
 }

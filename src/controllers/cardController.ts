@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import dayjs from "dayjs";
-// import * as customParseFormat from "dayjs/plugin/customParseFormat";
-// dayjs.extend(customParseFormat);
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+dayjs.extend(customParseFormat);
 
 import {
   cardServices,
@@ -20,13 +20,16 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
     };
   }
   
-  const employeeExists = await employeeServices.checkExistentEmployee(cardData.employeeId);
-  if (!employeeExists) {
+  const existentEmployee = await employeeServices.checkExistentEmployee(cardData.employeeId);
+  if (existentEmployee === undefined) {
     throw {
       type: "notFound",
       message: "employee does not exist",
     };
   }
+  console.log("funcionario: ", existentEmployee);
+
+  // !! obter nome do funcionario a partir de employeeExists !
   
   const employeeCardsByType = await cardServices.checkEmployeeCards(cardData.employeeId, cardData.type);
   if (employeeCardsByType !== undefined) {
@@ -44,7 +47,7 @@ export async function createNewCard(req: Request, res: Response): Promise<Object
     };
   }
   
-  const formattedNameOnCard = cardServices.formatCardName(cardData.cardholderName);
+  const formattedNameOnCard = cardServices.formatCardName(existentEmployee["fullName"]);
   cardData.cardholderName = formattedNameOnCard;
   
   cardData.expirationDate = dayjs().add(5, "y").format("MM-YY");
@@ -68,19 +71,18 @@ export async function activateCard(req: Request, res: Response): Promise<Object>
       message: "non-existent card",
     };
   }
-  console.log("CARTAO: ", existentCard);
+  //console.log("CARTAO: ", existentCard);
   
-  // conferir expirationDates <<<---
-  /*
-  const validadeCartao = existentCard["expirationDate"];
-  console.log(dayjs(validadeCartao, "MM-YY", true));
-  //console.log("válido?", dayjs(validadeCartao, "MM-YY").isValid());
+  const cardExpiration = existentCard["expirationDate"];
   
-  console.log(dayjs("07-27", "MM-YY").isAfter(dayjs("08-22", "MM-YY")), "<< depois");
-  */
-
-
-  // conferir cartão já ativado
+  const isCardExpired = cardServices.checkExpiryDate(cardExpiration);
+  if (isCardExpired) {
+    throw {
+      type: "",
+      message: "card is expired",
+    };
+  }
+  
   if (existentCard["password"] !== null) {
     throw {
       type: "unprocessable",
